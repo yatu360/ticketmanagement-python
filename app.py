@@ -11,13 +11,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
 
 class Event(db.Model):
-    id=db.Column(db.Integer)
     name = db.Column(db.String(200), primary_key=True, nullable =False)
     init_ticket = db.Column(db.String(200), nullable =False)
-    ticket = db.Column(MutableDict.as_mutable(JSON))
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    tickets=db.relationship('Tickets', backref='E')
+    
+class Tickets(db.Model):
+    id=db.Column(db.Integer, primary_key=True, nullable =False)
+    event_name = db.Column(db.String(200), db.ForeignKey('event.name'))
+    redeemed = db.Column(db.Boolean)
+    
 
-db.create_all()
     
 def __repr__(self):
     return '<Event %r>' %self.id
