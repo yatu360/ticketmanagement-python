@@ -1,0 +1,21 @@
+{% extends 'base.html'%}
+
+{%block head%}
+<title>Task Master</title>
+{% endblock %}
+{%block body%}
+<div class= "content">
+    <h1 style="text-align: center">Add Event</h1>
+    <div class="form">
+        <form action='/addevent/' method ="POST">
+            <input type="text" name="content" id="content">
+            <input type="number" name="content_ticket" id="content_ticket">
+            <input type="submit" value="Add Event">
+        </form>
+    </div>
+        <div>
+        <a href="/">Go Back</a>
+    </div>
+    </div>
+</div>
+{% endblock %}

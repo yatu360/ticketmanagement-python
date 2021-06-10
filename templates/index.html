@@ -4,35 +4,34 @@
 <title>Task Master</title>
 {% endblock %}
 {%block body%}
-<div class= "event">
-    <h1 style="text-align: center">Ticket Management App</h1>
-    <h4 style="text-align: center">There are no tickets. Add some below!</h4>
-    <table>
-        <tr>
-            <th>Ticket Id</th>
-            <th>Date Added</th>
-            <th>Event Date</th>
-            <th>Event Name</th>
-            <th>No of Tickets available</th>    
-        </tr>
-        {% for event in events %}
+<div class= "content">
+    <h1 style="text-align: center">Ticket Management System</h1>
+    {% if events|length<1%}
+        <h4 style="text-align: center">There are no events. Create one below!</h4>
+        {%else%}
+        <table>
             <tr>
-                <td>{{ event.content }}</td>
-                <td>{{ task.date_created.date() }}</td>
-                <td>
-                    <a href="/delete/{{task.id}}">Delete</a>
-                    <br>
-                    <a href="/update/{{task.id}}">Update</a>
-                </td>
+                <th>Event</th>
+                <th>Tickets</th>
+                <th>Added</th>
+                <th>Actions</th>
             </tr>
-        {% endfor %}
-    </table>    
-    <div class="form">
-        <form action='/' method ="POST">
-            <input type="text" name="content_name" id="content">
-            <!--<input type="number" name="content_ticket">-->
-            <input type="submit" value="Add Event">
-        </form>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.ticket}}</td>
+                    <td>{{ event.date_created.date() }}</td>
+                    <td>
+                        <a href="/delete/{{event.id}}">Delete</a>
+                        <br>
+                        <a href="/update/{{event.id}}">Update</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <div>
+        <a href="/addevent/">addevent</a>
     </div>
 </div>
 {% endblock %}
