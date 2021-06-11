@@ -37,7 +37,7 @@ def add():
             db.session.add(new_event)
             db.session.commit()
             for x in range(int(initial_ticket)):
-                tick = Tickets(event_ref=new_event, redeemed=True)
+                tick = Tickets(event_ref=new_event, redeemed=False)
                 db.session.add(tick)
                 db.session.commit()
             return redirect('/')
@@ -47,12 +47,25 @@ def add():
     else:
         return render_template('addevent.html')
     
+    
+@app.route('/addticket/<name>')
+def addticket(name):
+    tick = Tickets(event_name=name, redeemed=False)
+    try:
+        db.session.add(tick)
+        db.session.commit()
+    except:
+        return 'There was an issue adding your task'
+    viewer = Tickets.query.filter(Tickets.event_name==name).all()
+    
+    return render_template('view.html', viewer = viewer, title = name )
+ 
+    
 @app.route('/view/<name>')
 def view(name):
     viewer = Tickets.query.filter(Tickets.event_name==name).all()
-    for x in viewer:
-        print (x.id)
-    return "test"
+
+    return render_template('view.html', viewer = viewer, title = name )
 
 
 

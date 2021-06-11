@@ -5,34 +5,39 @@
 {% endblock %}
 {%block body%}
 <div class= "content">
-    <h1 style="text-align: center">Ticket Management System</h1>
+    <h1 style="text-align: center">{{title + " Event"}}</h1>
     <table>
     <tr>
-        <th>Event</th>
-            <th>Tickets</th>
-            <th>Actions</th>
-        </tr>
-        {% for event in events %}
-            {% set count = namespace(value=0) %}
-            <tr>
-                <td>{{ event.name }}</td>
-                {% for ticket in tickets %}
-                    {% if ticket.event_name == event.name and ticket.redeemed==False%}
-                        {% set count.value = count.value + 1 %}
-                    {% endif %}
-                {% endfor %}
-                <td>{{count.value}}</td>
-                
-                <td>
-                    <a href="/view/{{event.name}}">View</a>
-                    <br>
-                    <a href="/update/{{event.id}}">Update</a>
-                </td>
-            </tr>
+        <th>Total Tickets</th>
+        <th>Available Tickets</th>
+        <th>Redeemed Tickets</th>
+        <th>Actions</th>
+    </tr>
+    <tr>
+        <td>{{ viewer|length}}</td>
+        {% set ticket_a = namespace(value=0) %}
+        {% set ticket_r = namespace(value=0) %}
+        {% for view in viewer %}
+            {% if view.redeemed ==True %}
+                {% set ticket_r.value = ticket_r.value + 1 %}
+            {% else %}
+                {% set ticket_a.value = ticket_a.value + 1 %}
+            {% endif %}
         {% endfor %}
+        <td>{{ticket_a.value}}</td>
+        <td>{{ticket_r.value}}</td>
+
+        
+        <td>
+            <a href="/addticket/{{title}}">Add Tickets</a>
+            <br>
+            <br>
+            <a href="/update/">Refresh</a>
+        </td>
+    </tr>
     </table>
-<div>
-    <a href="/addevent/">addevent</a>
-</div>
+    <div>
+        <a href="/">Main Page</a>
+    </div>
 </div>
 {% endblock %}    
