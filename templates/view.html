@@ -1,0 +1,38 @@
+{% extends 'base.html'%}
+
+{%block head%}
+<title>Event Viewer</title>
+{% endblock %}
+{%block body%}
+<div class= "content">
+    <h1 style="text-align: center">Ticket Management System</h1>
+    <table>
+    <tr>
+        <th>Event</th>
+            <th>Tickets</th>
+            <th>Actions</th>
+        </tr>
+        {% for event in events %}
+            {% set count = namespace(value=0) %}
+            <tr>
+                <td>{{ event.name }}</td>
+                {% for ticket in tickets %}
+                    {% if ticket.event_name == event.name and ticket.redeemed==False%}
+                        {% set count.value = count.value + 1 %}
+                    {% endif %}
+                {% endfor %}
+                <td>{{count.value}}</td>
+                
+                <td>
+                    <a href="/view/{{event.name}}">View</a>
+                    <br>
+                    <a href="/update/{{event.id}}">Update</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+<div>
+    <a href="/addevent/">addevent</a>
+</div>
+</div>
+{% endblock %}    

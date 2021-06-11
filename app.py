@@ -1,9 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-from sqlalchemy.types import PickleType, TypeDecorator, VARCHAR
-from sqlalchemy.ext.mutable import Mutable, MutableDict
-from sqlalchemy import JSON
 
 
 app = Flask(__name__)
@@ -21,7 +17,6 @@ class Tickets(db.Model):
     redeemed = db.Column(db.Boolean)
     
 
-    
 def __repr__(self):
     return '<Event %r>' %self.id
 
@@ -51,10 +46,18 @@ def add():
 
     else:
         return render_template('addevent.html')
+    
+@app.route('/view/<name>')
+def view(name):
+    viewer = Tickets.query.filter(Tickets.event_name==name).all()
+    for x in viewer:
+        print (x.id)
+    return "test"
+
+
 
 @app.route('/redeem/<id>')
 def redeem(id):
-    
     ticket_redeem = Tickets.query.get_or_404(id)
     ticket_redeem.redeemed = True
     test=Tickets(redeemed=ticket_redeem.redeemed)
