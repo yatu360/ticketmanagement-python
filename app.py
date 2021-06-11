@@ -55,7 +55,7 @@ def addticket(name):
         db.session.add(tick)
         db.session.commit()
     except:
-        return 'There was an issue adding your task'
+        return 'There was an issue adding a ticket'
     viewer = Tickets.query.filter(Tickets.event_name==name).all()
     
     return render_template('view.html', viewer = viewer, title = name )
@@ -67,6 +67,23 @@ def view(name):
 
     return render_template('view.html', viewer = viewer, title = name )
 
+@app.route('/refresh/<name>')
+def delete(name):
+    refresh_tickets = Tickets.query.filter(Tickets.event_name==name).all()
+    event_info = Event.query.get_or_404(name)
+    try:
+        for tickets in refresh_tickets:
+            db.session.delete(tickets)
+        db.session.commit()
+        for x in range(int(event_info.init_ticket)):
+                tick = Tickets(event_ref=event_info, redeemed=False)
+                db.session.add(tick)
+                db.session.commit()
+    except:
+        return 'There was a problem deleting that task'
+    
+    viewer = Tickets.query.filter(Tickets.event_name==name).all()
+    return render_template('view.html', viewer = viewer, title = name )
 
 
 @app.route('/redeem/<id>')
