@@ -13,7 +13,7 @@ db = SQLAlchemy(app)
 class Event(db.Model):
     name = db.Column(db.String(200), primary_key=True, nullable =False)
     init_ticket = db.Column(db.String(200), nullable =False)
-    tickets=db.relationship('Tickets', backref='E')
+    tickets=db.relationship('Tickets', backref='event_ref')
     
 class Tickets(db.Model):
     id=db.Column(db.Integer, primary_key=True, nullable =False)
@@ -27,22 +27,24 @@ def __repr__(self):
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    events = Event.query.order_by(Event.date_created).all()
-    return render_template('index.html', events=events)
+    events = Event.query.order_by(Event.name).all()
+    tickets = Tickets.query.all()
+    return render_template('index.html', events=events, tickets=tickets)
 
 @app.route('/addevent/',methods=['POST', 'GET'])
 def add():
     if request.method == 'POST':
         event_content = request.form['content']
         initial_ticket = request.form['content_ticket']
-        l = [event_content+"-"+str(t+1) for t in range(int(initial_ticket))]
-        tick = {"available":l, "redeemed":[]}
-        
-        new_event = Event(name=event_content, init_ticket = initial_ticket, ticket = tick)
+        new_event = Event(name=event_content, init_ticket = initial_ticket)
 
         try:
             db.session.add(new_event)
             db.session.commit()
+            for x in range(int(initial_ticket)):
+                tick = Tickets(event_ref=new_event, redeemed=True)
+                db.session.add(tick)
+                db.session.commit()
             return redirect('/')
         except:
             return 'There was an issue adding your task'
