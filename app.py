@@ -9,6 +9,7 @@ db = SQLAlchemy(app)
 class Event(db.Model):
     name = db.Column(db.String(200), primary_key=True, nullable =False)
     init_ticket = db.Column(db.String(200), nullable =False)
+    date = db.Column(db.String(10), nullable=False)
     tickets=db.relationship('Tickets', backref='event_ref')
     
 class Tickets(db.Model):
@@ -44,7 +45,8 @@ def add():
     if request.method == 'POST':
         event_content = request.form['content']
         initial_ticket = request.form['content_ticket']
-        new_event = Event(name=event_content, init_ticket = initial_ticket)
+        event_date = request.form['content_date']
+        new_event = Event(name=event_content, init_ticket = initial_ticket, date = event_date)
 
         try:
             db.session.add(new_event)

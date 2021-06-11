@@ -12,7 +12,8 @@
         <table>
             <tr>
                 <th>Event</th>
-                <th>Tickets</th>
+                <th>Tickets Available</th>
+                <th>Event Date</th>
                 <th>Actions</th>
             </tr>
             {% for event in events %}
@@ -25,7 +26,7 @@
                         {% endif %}
                     {% endfor %}
                     <td>{{count.value}}</td>
-                    
+                    <td>{{event.date}}</td>
                     <td>
                         <a href="/view/{{event.name}}">View</a>
                     </td>
