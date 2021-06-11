@@ -26,6 +26,19 @@ def index():
     tickets = Tickets.query.all()
     return render_template('index.html', events=events, tickets=tickets)
 
+
+@app.route('/check/', methods=['POST', 'GET'])
+def check():
+    if request.method == 'POST':
+        id = request.form['content']
+        ticket = Tickets.query.get_or_404(id)
+        if ticket.redeemed == True:
+            return 'The ticket has been redeemed'
+        else:
+            return 'The ticket is ok (available)'
+    return render_template('check.html')
+
+
 @app.route('/addevent/',methods=['POST', 'GET'])
 def add():
     if request.method == 'POST':
@@ -43,7 +56,6 @@ def add():
             return redirect('/')
         except:
             return 'There was an issue adding your task'
-
     else:
         return render_template('addevent.html')
     
@@ -64,11 +76,10 @@ def addticket(name):
 @app.route('/view/<name>')
 def view(name):
     viewer = Tickets.query.filter(Tickets.event_name==name).all()
-
     return render_template('view.html', viewer = viewer, title = name )
 
 @app.route('/refresh/<name>')
-def delete(name):
+def refresh(name):
     refresh_tickets = Tickets.query.filter(Tickets.event_name==name).all()
     event_info = Event.query.get_or_404(name)
     try:
@@ -81,9 +92,23 @@ def delete(name):
                 db.session.commit()
     except:
         return 'There was a problem deleting that task'
+    return view(name)
+
+
+@app.route('/redeemticket/<name>')
+def redeemticket(name):
+    redeem_tickets = Tickets.query.filter(Tickets.event_name==name).all()
+    for tickets in redeem_tickets:
+        if tickets.redeemed==False:
+            tickets.redeemed=True
+            tick=Tickets(redeemed=tickets.redeemed)
+            try:
+                db.session.commit()
+                return view(name)
+            except:
+                return 'There was a problem redeeming a ticket'
+    return 'There are no more tickets for this event'
     
-    viewer = Tickets.query.filter(Tickets.event_name==name).all()
-    return render_template('view.html', viewer = viewer, title = name )
 
 
 @app.route('/redeem/<id>')
