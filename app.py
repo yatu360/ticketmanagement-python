@@ -51,8 +51,8 @@ def add():
             db.session.commit()
             for x in range(int(initial_ticket)):
                 tick = Tickets(event_ref=new_event, redeemed=False)
-                db.session.add(tick)
-                db.session.commit()
+            db.session.add(tick)
+            db.session.commit()
             return redirect('/')
         except:
             return 'There was an issue adding your task'
@@ -87,9 +87,9 @@ def refresh(name):
             db.session.delete(tickets)
         db.session.commit()
         for x in range(int(event_info.init_ticket)):
-                tick = Tickets(event_ref=event_info, redeemed=False)
-                db.session.add(tick)
-                db.session.commit()
+            tick = Tickets(event_ref=event_info, redeemed=False)
+        db.session.add(tick)
+        db.session.commit()
     except:
         return 'There was a problem deleting that task'
     return view(name)
