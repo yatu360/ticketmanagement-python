@@ -50,22 +50,15 @@ def add():
             return 'There was an issue adding your task'
 
     else:
-        
         return render_template('addevent.html')
 
 @app.route('/redeem/<id>')
 def redeem(id):
-    val = id.split("-")
     
-    ticket_redeem = Event.query.get_or_404(val[0])
-    ticket_redeem.ticket["redeemed"].append(ticket_redeem.ticket["available"][0])
-    ticket_redeem.ticket["available"].pop(0)
-    print(ticket_redeem.ticket["redeemed"])
-    test=Event(name = ticket_redeem.name, init_ticket = ticket_redeem.init_ticket, ticket=ticket_redeem.ticket)
-    print(ticket_redeem.ticket)
+    ticket_redeem = Tickets.query.get_or_404(id)
+    ticket_redeem.redeemed = True
+    test=Tickets(redeemed=ticket_redeem.redeemed)
     try:
-        db.session.delete(ticket_redeem)
-        db.session.add(test)
         db.session.commit()
         return redirect('/')
     except:

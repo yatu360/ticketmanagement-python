@@ -1,7 +1,7 @@
 {% extends 'base.html'%}
 
 {%block head%}
-<title>Task Master</title>
+<title>Event Master</title>
 {% endblock %}
 {%block body%}
 <div class= "content">
@@ -27,7 +27,7 @@
                     <td>{{count.value}}</td>
                     
                     <td>
-                        <a href="/delete/{{event.id}}">Delete</a>
+                        <a href="/view/{{event.name}}">View</a>
                         <br>
                         <a href="/update/{{event.id}}">Update</a>
                     </td>
