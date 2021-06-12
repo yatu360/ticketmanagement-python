@@ -17,15 +17,8 @@
         <td>{{ viewer|length}}</td>
         {% set ticket_a = namespace(value=0) %}
         {% set ticket_r = namespace(value=0) %}
-        {% for view in viewer %}
-            {% if view.redeemed ==True %}
-                {% set ticket_r.value = ticket_r.value + 1 %}
-            {% else %}
-                {% set ticket_a.value = ticket_a.value + 1 %}
-            {% endif %}
-        {% endfor %}
-        <td>{{ticket_a.value}}</td>
-        <td>{{ticket_r.value}}</td>
+        <td>{{available}}</td>
+        <td>{{redeemed}}</td>
 
         
         <td>

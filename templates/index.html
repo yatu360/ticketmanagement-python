@@ -17,15 +17,9 @@
                 <th>Actions</th>
             </tr>
             {% for event in events %}
-                {% set count = namespace(value=0) %}
                 <tr>
-                    <td>{{ event.name }}</td>
-                    {% for ticket in tickets %}
-                        {% if ticket.event_name == event.name and ticket.redeemed==False%}
-                            {% set count.value = count.value + 1 %}
-                        {% endif %}
-                    {% endfor %}
-                    <td>{{count.value}}</td>
+                    <td>{{event.name }}</td>
+                    <td>{{event.available}}</td>
                     <td>{{event.date}}</td>
                     <td>
                         <a href="/view/{{event.name}}">View</a>

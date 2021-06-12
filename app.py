@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -10,7 +10,10 @@ class Event(db.Model):
     name = db.Column(db.String(200), primary_key=True, nullable =False)
     init_ticket = db.Column(db.String(200), nullable =False)
     date = db.Column(db.String(10), nullable=False)
+    available = db.Column(db.Integer)
+    redeemed_ticket = db.Column(db.Integer)
     tickets=db.relationship('Tickets', backref='event_ref')
+    
     
 class Tickets(db.Model):
     id=db.Column(db.Integer, primary_key=True, nullable =False)
@@ -46,7 +49,7 @@ def add():
         event_content = request.form['content']
         initial_ticket = request.form['content_ticket']
         event_date = request.form['content_date']
-        new_event = Event(name=event_content, init_ticket = initial_ticket, date = event_date)
+        new_event = Event(name=event_content, init_ticket = initial_ticket, date = event_date, available = initial_ticket, redeemed_ticket= 0)
 
         try:
             db.session.add(new_event)
@@ -64,6 +67,8 @@ def add():
 @app.route('/addticket/<name>')
 def addticket(name):
     tick = Tickets(event_name=name, redeemed=False)
+    event_info = Event.query.get_or_404(name)
+    event_info.available += 1
     try:
         db.session.add(tick)
         db.session.commit()
@@ -75,12 +80,15 @@ def addticket(name):
 @app.route('/view/<name>')
 def view(name):
     viewer = Tickets.query.filter(Tickets.event_name==name).all()
-    return render_template('view.html', viewer = viewer, title = name )
+    event_info = Event.query.get_or_404(name)
+    return render_template('view.html', viewer = viewer, title = name, available = event_info.available, redeemed= event_info.redeemed_ticket )
 
 @app.route('/reset/<name>')
 def reset(name):
     refresh_tickets = Tickets.query.filter(Tickets.event_name==name).all()
     event_info = Event.query.get_or_404(name)
+    event_info.available = event_info.init_ticket
+    event_info.redeemed_ticket = 0
     try:
         for tickets in refresh_tickets:
             db.session.delete(tickets)
@@ -97,9 +105,12 @@ def reset(name):
 @app.route('/redeemticket/<name>')
 def redeemticket(name):
     redeem_tickets = Tickets.query.filter(Tickets.event_name==name).all()
+    event_info = Event.query.get_or_404(name)
     for tickets in redeem_tickets:
         if tickets.redeemed==False:
             tickets.redeemed=True
+            event_info.available -= 1
+            event_info.redeemed_ticket += 1
             tick=Tickets(redeemed=tickets.redeemed)
             try:
                 db.session.commit()
@@ -113,10 +124,12 @@ def redeemticket(name):
 @app.route('/redeem/<id>')
 def redeem(id):
     ticket_redeem = Tickets.query.get_or_404(id)
+    event_info = Event.query.get_or_404(ticket_redeem.event_name)
     if ticket_redeem.redeemed==True:
         return '410 GONE'
     ticket_redeem.redeemed = True
-    test=Tickets(redeemed=ticket_redeem.redeemed)
+    event_info.available -= 1
+    event_info.redeemed_ticket += 1
     try:
         db.session.commit()
         return '200 OK'
