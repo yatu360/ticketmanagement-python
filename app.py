@@ -59,8 +59,7 @@ def add():
         except:
             return 'There was an issue adding your task'
     else:
-        return render_template('addevent.html')
-    
+        return render_template('addevent.html')   
     
 @app.route('/addticket/<name>')
 def addticket(name):
@@ -70,9 +69,7 @@ def addticket(name):
         db.session.commit()
     except:
         return 'There was an issue adding a ticket'
-    viewer = Tickets.query.filter(Tickets.event_name==name).all()
-    
-    return render_template('view.html', viewer = viewer, title = name )
+    return view(name)
  
     
 @app.route('/view/<name>')
@@ -80,8 +77,8 @@ def view(name):
     viewer = Tickets.query.filter(Tickets.event_name==name).all()
     return render_template('view.html', viewer = viewer, title = name )
 
-@app.route('/refresh/<name>')
-def refresh(name):
+@app.route('/reset/<name>')
+def reset(name):
     refresh_tickets = Tickets.query.filter(Tickets.event_name==name).all()
     event_info = Event.query.get_or_404(name)
     try:
@@ -116,11 +113,13 @@ def redeemticket(name):
 @app.route('/redeem/<id>')
 def redeem(id):
     ticket_redeem = Tickets.query.get_or_404(id)
+    if ticket_redeem.redeemed==True:
+        return '410 GONE'
     ticket_redeem.redeemed = True
     test=Tickets(redeemed=ticket_redeem.redeemed)
     try:
         db.session.commit()
-        return redirect('/')
+        return '200 OK'
     except:
         return 'There was a problem redeeming the ticket'
          
