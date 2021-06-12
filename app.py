@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
+from flask.json import jsonify
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -76,12 +77,33 @@ def addticket(name):
         return 'There was an issue adding a ticket'
     return view(name)
  
-    
+@app.route('/api/addticket/<name>')
+def addticket_api(name):
+    tick = Tickets(event_name=name, redeemed=False)
+    event_info = Event.query.get_or_404(name)
+    event_info.available += 1
+    try:
+        db.session.add(tick)
+        db.session.commit()
+    except:
+        return 'There was an issue adding a ticket'
+    return "200: OK"
+ 
+ 
 @app.route('/view/<name>')
 def view(name):
-    viewer = Tickets.query.filter(Tickets.event_name==name).all()
+    
     event_info = Event.query.get_or_404(name)
-    return render_template('view.html', viewer = viewer, title = name, available = event_info.available, redeemed= event_info.redeemed_ticket )
+    return render_template('view.html', total = event_info.available+event_info.redeemed_ticket, title = name, available = event_info.available, redeemed= event_info.redeemed_ticket)
+
+
+@app.route('/api/view/<name>')
+def view_api(name):
+    
+    event_info = Event.query.get_or_404(name)
+    return jsonify(json_list = event_info.all())
+
+
 
 @app.route('/reset/<name>')
 def reset(name):
