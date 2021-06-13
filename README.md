@@ -18,10 +18,12 @@ For clarity I have decided to demonstrate the workings of the app using the anim
 
 ## GET request APIs
 APIs can be tested directly from the web browser URL address bar and the changes can be verified using the frontend webservice.
+<br />
 /api/addticket/<name>
-
+<br />
 /redeem/<id>
 
 ## If I had more time
 Design and create automated unit test to test each method.
+  <br />
 Explore use of database management directly rather than SQLAlchemy.
