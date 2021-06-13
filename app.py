@@ -1,7 +1,5 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
-from flask.json import jsonify
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -50,7 +48,8 @@ def add():
         event_content = request.form['content']
         initial_ticket = request.form['content_ticket']
         event_date = request.form['content_date']
-        new_event = Event(name=event_content, init_ticket = initial_ticket, date = event_date, available = initial_ticket, redeemed_ticket= 0)
+        new_event = Event(name=event_content, init_ticket = initial_ticket, date = event_date, 
+                          available = initial_ticket, redeemed_ticket= 0)
 
         try:
             db.session.add(new_event)
@@ -94,14 +93,16 @@ def addticket_api(name):
 def view(name):
     
     event_info = Event.query.get_or_404(name)
-    return render_template('view.html', total = event_info.available+event_info.redeemed_ticket, title = name, available = event_info.available, redeemed= event_info.redeemed_ticket)
+    return render_template('view.html', total = event_info.available+event_info.redeemed_ticket, title = name, 
+                           available = event_info.available, redeemed= event_info.redeemed_ticket)
 
 
 @app.route('/api/view/<name>')
 def view_api(name):
     
     event_info = Event.query.get_or_404(name)
-    return jsonify(json_list = event_info.all())
+    return {"Event Name": event_info.name, "Total Tickets": event_info.available+event_info.redeemed_ticket, 
+            "Available tickets": event_info.available, "Redeemed Tickets": event_info.redeemed_ticket}
 
 
 
@@ -144,7 +145,7 @@ def redeemticket(name):
 
 
 @app.route('/redeem/<id>')
-def redeem(id):
+def redeem_api(id):
     ticket_redeem = Tickets.query.get_or_404(id)
     event_info = Event.query.get_or_404(ticket_redeem.event_name)
     if ticket_redeem.redeemed==True:
