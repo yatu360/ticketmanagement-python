@@ -6,6 +6,10 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///event.db'
 db = SQLAlchemy(app)
 
+
+'''
+Declaring the Event table
+'''
 class Event(db.Model):
     name = db.Column(db.String(200), primary_key=True, nullable =False)
     init_ticket = db.Column(db.Integer, nullable =False)
@@ -14,22 +18,30 @@ class Event(db.Model):
     redeemed_ticket = db.Column(db.Integer)
     tickets=db.relationship('Tickets', backref='event_ref')
     
-    
+
+'''
+Declaring the Ticket table
+'''   
 class Tickets(db.Model):
     id=db.Column(db.Integer, primary_key=True, nullable =False)
     event_name = db.Column(db.String(200), db.ForeignKey('event.name'))
     redeemed = db.Column(db.Boolean)
     
 
-def __repr__(self):
-    return '<Event %r>' %self.id
-
+'''
+Renders the index page
+'''
 @app.route('/', methods=['POST', 'GET'])
 def index():
     events = Event.query.order_by(Event.name).all()
     tickets = Tickets.query.all()
     return render_template('index.html', events=events, tickets=tickets)
 
+
+
+'''
+Deletes the database and creates a new one, thereby deleting all the entries.
+'''
 @app.route('/delete1/')
 def delete():
     if os.path.exists("event.db"):
@@ -39,6 +51,11 @@ def delete():
         return("The file does not exist")    
     return index()
 
+
+
+'''
+Deletes the database and creates a new one, thereby deleting all the entries.
+'''
 @app.route('/api/delete/')
 def delete_api():
     if os.path.exists("event.db"):
@@ -49,6 +66,10 @@ def delete_api():
     return "All data deleted"
 
 
+'''
+Receives ticket id from the page’s form and displays ‘The ticket is ok (available)’ if the ticket 
+is available or ‘The ticket has been redeemed’ if the ticket is redeemed.
+'''
 @app.route('/check/', methods=['POST', 'GET'])
 def check():
     status = ""
@@ -64,6 +85,13 @@ def check():
         status = 'There was an error, please input valid ticket ids only'
     return render_template('check.html', status = status)
 
+
+
+'''
+This method exposes an endpoint where it takes in the unique ticket id as a parameter and returns 
+‘The ticket is ok (available)’ if the ticket is available or ‘The ticket has been redeemed’ if the 
+ticket is redeemed.
+'''
 @app.route('/api/check/<id>', methods=['POST', 'GET'])
 def check_api(id):
     try:
@@ -76,6 +104,12 @@ def check_api(id):
         '400: Error, invalid ticket identifier'
 
 
+
+'''
+Receives event name, date of event and the number of initial tickets from form located in addevent.html page. 
+Processes the information by initialising the available and redeemed tickets; available = initial tickets and redeemed tickets = 0. 
+Finally processes ticket IDs for N tickets of the event and stores them in the Tickets table; this is done via for-loop.
+'''
 @app.route('/addevent/',methods=['POST', 'GET'])
 def add():
     if request.method == 'POST':
@@ -96,7 +130,14 @@ def add():
             return 'There was an issue adding your task'
     else:
         return render_template('addevent.html')   
-    
+
+
+
+'''
+Takes in name as a parameter, then queries to retrieve the event information, using which it adds one ticket to 
+the available data of the event. The method also adds one ticket to the ticket table and links it to the event as 
+well as assigning it with the next increment of ticket ID.
+'''
 @app.route('/addticket/<name>')
 def addticket(name):
     tick = Tickets(event_name=name, redeemed=False)
@@ -108,7 +149,13 @@ def addticket(name):
     except:
         return 'There was an issue adding a ticket'
     return view(name)
- 
+
+
+
+'''
+This method exposes an endpoint where it takes in the event name as a parameter and adds a ticket its 
+available number of tickets. Returns ‘200: OK’ if it successfully added the ticket.
+'''
 @app.route('/api/addticket/<name>')
 def addticket_api(name):
     tick = Tickets(event_name=name, redeemed=False)
@@ -121,7 +168,11 @@ def addticket_api(name):
         return 'There was an issue adding a ticket'
     return "200: OK"
  
- 
+
+'''
+Takes in name parameter then queries the name to retrieve the information from the database. 
+This information is then past to the view template where the information is displayed to the user.
+'''
 @app.route('/view/<name>')
 def view(name):
     
@@ -130,6 +181,10 @@ def view(name):
                            available = event_info.available, redeemed= event_info.redeemed_ticket)
 
 
+'''
+This method exposes an endpoint where it takes in the event name as a parameter and returns json serialised container 
+with event name, total tickets, available tickets, and redeemed tickets.
+'''
 @app.route('/api/view/<name>')
 def view_api(name):
     
@@ -139,6 +194,10 @@ def view_api(name):
 
 
 
+'''
+Takes in name as a parameter then queries to retrieve the event information, using which it deletes all 
+the tickets and reinitialises the event to its original information.
+'''
 @app.route('/reset/<name>')
 def reset(name):
     refresh_tickets = Tickets.query.filter(Tickets.event_name==name).all()
@@ -158,6 +217,11 @@ def reset(name):
     return view(name)
 
 
+'''
+Takes in name as a parameter, then queries to retrieve the event information, using which it sets the first available ticket
+of the event to be redeemed. The method also changes the value of the redeemed section of 1 ticket from the Ticket table 
+linked to the event to be ‘True’.
+'''
 @app.route('/redeemticket/<name>')
 def redeemticket(name):
     redeem_tickets = Tickets.query.filter(Tickets.event_name==name).all()
@@ -177,6 +241,10 @@ def redeemticket(name):
     
 
 
+'''
+This method exposes an endpoint where it takes in the ticket id as a parameter and redeems the stated ticket, 
+if the ticket redemption is successful returns’200: OK’, else it returns ‘410: GONE’ if the ticket has already been redeemed.
+'''
 @app.route('/redeem/<id>')
 def redeem_api(id):
     ticket_redeem = Tickets.query.get_or_404(id)
