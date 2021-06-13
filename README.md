@@ -10,7 +10,7 @@ An event ticket management system using Python, Flask and Jinja2
 app.py located in the root directory in this repo.
 
 
-## Live Demonstration
+## Video Demonstration
 For clarity I have decided to demonstrate the workings of the app using the animated clip embedded below.
 
 ![](/demo/webservicedemo.gif)
