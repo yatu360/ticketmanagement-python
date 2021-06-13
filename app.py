@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -29,6 +30,24 @@ def index():
     tickets = Tickets.query.all()
     return render_template('index.html', events=events, tickets=tickets)
 
+@app.route('/delete/')
+def delete():
+    if os.path.exists("test.db"):
+        os.remove("test.db")
+        db.create_all()
+    else:
+        return("The file does not exist")    
+    return index()
+
+@app.route('/api/delete/')
+def delete_api():
+    if os.path.exists("test.db"):
+        os.remove("test.db")
+        db.create_all()
+    else:
+        return("The file does not exist")    
+    return "All data deleted"
+
 
 @app.route('/check/', methods=['POST', 'GET'])
 def check():
@@ -50,7 +69,6 @@ def add():
         event_date = request.form['content_date']
         new_event = Event(name=event_content, init_ticket = initial_ticket, date = event_date, 
                           available = initial_ticket, redeemed_ticket= 0)
-
         try:
             db.session.add(new_event)
             db.session.commit()
