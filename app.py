@@ -3,12 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///event.db'
 db = SQLAlchemy(app)
 
 class Event(db.Model):
     name = db.Column(db.String(200), primary_key=True, nullable =False)
-    init_ticket = db.Column(db.String(200), nullable =False)
+    init_ticket = db.Column(db.Integer, nullable =False)
     date = db.Column(db.String(10), nullable=False)
     available = db.Column(db.Integer)
     redeemed_ticket = db.Column(db.Integer)
@@ -30,7 +30,7 @@ def index():
     tickets = Tickets.query.all()
     return render_template('index.html', events=events, tickets=tickets)
 
-@app.route('/delete/')
+@app.route('/delete1/')
 def delete():
     if os.path.exists("test.db"):
         os.remove("test.db")
@@ -51,14 +51,29 @@ def delete_api():
 
 @app.route('/check/', methods=['POST', 'GET'])
 def check():
-    if request.method == 'POST':
-        id = request.form['content']
+    status = ""
+    try:
+        if request.method == 'POST':
+            id = request.form['content']
+            ticket = Tickets.query.get_or_404(id)
+            if ticket.redeemed == True:
+                status = 'The ticket has been redeemed'
+            else:
+                status =  'The ticket is ok (available)'
+    except:
+        status = 'There was an error, please input valid ticket ids only'
+    return render_template('check.html', status = status)
+
+@app.route('/api/check/<id>', methods=['POST', 'GET'])
+def check_api(id):
+    try:
         ticket = Tickets.query.get_or_404(id)
         if ticket.redeemed == True:
             return 'The ticket has been redeemed'
         else:
             return 'The ticket is ok (available)'
-    return render_template('check.html')
+    except:
+        '400: Error, invalid ticket identifier'
 
 
 @app.route('/addevent/',methods=['POST', 'GET'])
