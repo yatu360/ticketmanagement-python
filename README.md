@@ -27,3 +27,5 @@ APIs can be tested directly from the web browser URL address bar and the changes
 Design and create automated unit test to test each method.
   <br />
 Explore use of database management directly rather than SQLAlchemy.
+<br />
+Dockerize the app: I was able to dockerise the application but was not able to test or push the image to docker-repo
