@@ -32,8 +32,8 @@ def index():
 
 @app.route('/delete1/')
 def delete():
-    if os.path.exists("test.db"):
-        os.remove("test.db")
+    if os.path.exists("event.db"):
+        os.remove("event.db")
         db.create_all()
     else:
         return("The file does not exist")    
@@ -41,8 +41,8 @@ def delete():
 
 @app.route('/api/delete/')
 def delete_api():
-    if os.path.exists("test.db"):
-        os.remove("test.db")
+    if os.path.exists("event.db"):
+        os.remove("event.db")
         db.create_all()
     else:
         return("The file does not exist")    
@@ -173,7 +173,7 @@ def redeemticket(name):
                 return view(name)
             except:
                 return 'There was a problem redeeming a ticket'
-    return 'There are no more tickets for this event'
+    return view(name)
     
 
 
@@ -194,6 +194,6 @@ def redeem_api(id):
          
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run()
     
     
